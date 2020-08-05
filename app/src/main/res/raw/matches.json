@@ -1,0 +1,13 @@
+{
+  "type": "subscribe",
+  "channels": [
+    "matches",
+    "heartbeat",
+    {
+      "name": "ticker",
+      "product_ids": [
+        "BTC-USD"
+      ]
+    }
+  ]
+}

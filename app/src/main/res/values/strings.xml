@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BTCTicker</string>
+    <string name="ticker_value">20000</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="configure">Configure</string>
+    <string name="add_widget">Add widget</string>
+    <string name="channel_name">TickerChannel</string>
+    <string name="channel_description">TickerLockServiceChannel</string>
+    <string name="title_activity_btcticker">BTCTickerActivity</string>
+    <string name="coinbase_spot_url">https://api.coinbase.com/v2/prices/spot?currency=USD</string>
+</resources>
