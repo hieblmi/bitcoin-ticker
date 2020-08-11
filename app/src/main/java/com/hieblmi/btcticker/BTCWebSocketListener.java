@@ -3,7 +3,6 @@ package com.hieblmi.btcticker;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.util.Log;
-import android.widget.RelativeLayout;
 
 import com.google.gson.Gson;
 import com.hieblmi.btcticker.databinding.ActivityBtctickerBinding;
@@ -25,7 +24,6 @@ public class BTCWebSocketListener extends WebSocketListener {
     private final String TAG = this.getClass().getName();
     private Activity mActivity;
     private ActivityBtctickerBinding mBinding;
-    RelativeLayout.LayoutParams layoutParams;
     private Queue mBuyQueue;
     private Queue mSellQueue;
 

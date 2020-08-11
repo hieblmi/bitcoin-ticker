@@ -1,10 +1,11 @@
 package com.hieblmi.btcticker;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -35,87 +36,101 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
 public class BTCTickerActivity extends AppCompatActivity {
 
     private final String TAG = this.getClass().getName();
-
+    private final String BITCOIN = " \u20BF ";
+    private final String DOLLAR = "$";
     private final String mUrl = "wss://ws-feed.pro.coinbase.com";
+    private final int ANIMATION_DURATION = 2200;
+    private final int BACKGROUND_COLOR = 0xFF070F17;
+
+    RelativeLayout.LayoutParams layoutParams;
+
     private ActivityBtctickerBinding mBinding;
     private WebSocketListener mWebSocketListener;
     private OkHttpClient mHttpClient;
-    private WebSocket mWebSocket;
-
-    private final String BITCOIN = " \u20BF ";
-    private final String DOLLAR = "$";
-    private final int ANIMATION_DURATION = 15000;
 
     private PriorityBlockingQueue<TickerUpdate> buyQueue;
     private PriorityBlockingQueue<TickerUpdate> sellQueue;
+    Timer timer;
+    TimerTask updateUITask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
 
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(0xFF070F17);
+        window.setStatusBarColor(BACKGROUND_COLOR);
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_btcticker);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_btcticker);
         buyQueue = new PriorityBlockingQueue<>();
         sellQueue = new PriorityBlockingQueue<>();
         mWebSocketListener = new BTCWebSocketListener(this, mBinding, buyQueue, sellQueue);
+    }
+
+    private void startTicker() {
         mHttpClient = new OkHttpClient.Builder()
                 .readTimeout(0, TimeUnit.MILLISECONDS)
                 .build();
+        setContentView(R.layout.activity_btcticker);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_btcticker);
         subscribe(mHttpClient, mWebSocketListener);
         startUpdateUITimer();
     }
 
-    private void startUpdateUITimer() {
-        Log.d(TAG, "Starting timer task to display ticker updates...");
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                updateUI();
-            }
-        }, 0, 300);
-    }
-
     private void subscribe(OkHttpClient client, WebSocketListener listener) {
         Request request = new Request.Builder().url(mUrl).build();
-        mWebSocket = client.newWebSocket(request, listener);
+        client.newWebSocket(request, listener);
         client.dispatcher().executorService().shutdown();
     }
 
-    private void updateUI() {
-        Log.d(TAG, "Updating UI");
-        runOnUiThread(() -> {
-            if (!buyQueue.isEmpty()) {
-                String side = buyQueue.peek().getSide();
-                animate(getListView(buyQueue), side);
-            } else if (!sellQueue.isEmpty()) {
-                String side = sellQueue.peek().getSide();
-                animate(getListView(sellQueue), side);
+    private void stopTicker() {
+        updateUITask.cancel();
+        mHttpClient.dispatcher().cancelAll();
+        mBinding.mainView.removeAllViews();
+    }
+
+    private void startUpdateUITimer() {
+        Log.d(TAG, "Starting timer task to display ticker updates...");
+        timer = new Timer();
+        updateUITask = new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(() -> {
+                    Log.d(TAG, "Updating UI");
+                    if (!buyQueue.isEmpty()) {
+                        String side = buyQueue.peek().getSide();
+                        animate(getListView(buyQueue), side);
+                    } else if (!sellQueue.isEmpty()) {
+                        String side = sellQueue.peek().getSide();
+                        animate(getListView(sellQueue), side);
+                    }
+                });
             }
-        });
+        };
+        timer.scheduleAtFixedRate(updateUITask, 0, 300);
     }
 
     private void animate(ListView listView, String side) {
         ObjectAnimator backgroundFade = backgroundFade(listView, side);
         ObjectAnimator translationAnimation = getViewTranslationAnimation(listView, side);
-        translationAnimation.setInterpolator(new DecelerateInterpolator(10));
+        translationAnimation.setInterpolator(new DecelerateInterpolator(1.5f));
         translationAnimation.setDuration(ANIMATION_DURATION);
-        ValueAnimator fadeAnim = ObjectAnimator.ofFloat(listView, "alpha", 1f, 1f);
-        fadeAnim.setDuration(2000);
         AnimatorSet animation = new AnimatorSet();
         animation.play(backgroundFade).with(translationAnimation);
+        final ListView v = listView;
+        animation.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                v.setVisibility(View.INVISIBLE);
+            }
+        });
         animation.start();
     }
 
@@ -130,10 +145,9 @@ public class BTCTickerActivity extends AppCompatActivity {
                 R.id.priceView,
                 updates);
         list.setAdapter(adapter);
-        RelativeLayout.LayoutParams layoutParams;
-        layoutParams =
-                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+        layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         mBinding.mainView.addView(list, layoutParams);
@@ -146,8 +160,8 @@ public class BTCTickerActivity extends AppCompatActivity {
                 "backgroundColor",
                 new ArgbEvaluator(),
                 "buy".equals(side) ? 0x6600FF00 : 0x66FF0000,
-                0xFF070F17);
-        colorFade.setDuration(150);
+                BACKGROUND_COLOR);
+        colorFade.setDuration(200);
         colorFade.setStartDelay(0);
         return colorFade;
     }
@@ -156,7 +170,8 @@ public class BTCTickerActivity extends AppCompatActivity {
         PropertyValuesHolder y = PropertyValuesHolder.ofFloat("translationY", 1000f);
         if ("buy".equals(side))
             y = PropertyValuesHolder.ofFloat("translationY", -1000f);
-        PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha", 0);
+        PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha", 0.0f);
+
         return ObjectAnimator.ofPropertyValuesHolder(view, alpha, y);
     }
 
@@ -187,20 +202,24 @@ public class BTCTickerActivity extends AppCompatActivity {
     protected void onPause() {
         Log.d(TAG, "onPause");
         super.onPause();
+
+        stopTicker();
     }
 
     @Override
     protected void onResume() {
         Log.d(TAG, "onResume");
         super.onResume();
+
+        startTicker();
     }
 
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-        int NORMAL_CLOSURE = 1000;
-        mWebSocket.close(NORMAL_CLOSURE, "Closing websocket");
+
+        stopTicker();
     }
 
     @Override
