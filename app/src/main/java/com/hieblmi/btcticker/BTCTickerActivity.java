@@ -44,7 +44,7 @@ public class BTCTickerActivity extends AppCompatActivity {
     private final String BITCOIN = " \u20BF ";
     private final String DOLLAR = "$";
     private final String mUrl = "wss://ws-feed.pro.coinbase.com";
-    private final int ANIMATION_DURATION = 2200;
+    private final int ANIMATION_DURATION = 5000;
     private final int BACKGROUND_COLOR = 0xFF070F17;
 
     RelativeLayout.LayoutParams layoutParams;
@@ -113,7 +113,7 @@ public class BTCTickerActivity extends AppCompatActivity {
                 });
             }
         };
-        timer.scheduleAtFixedRate(updateUITask, 0, 300);
+        timer.scheduleAtFixedRate(updateUITask, 0, 500);
     }
 
     private void animate(ListView listView, String side) {
@@ -161,7 +161,7 @@ public class BTCTickerActivity extends AppCompatActivity {
                 new ArgbEvaluator(),
                 "buy".equals(side) ? 0x6600FF00 : 0x66FF0000,
                 BACKGROUND_COLOR);
-        colorFade.setDuration(200);
+        colorFade.setDuration(170);
         colorFade.setStartDelay(0);
         return colorFade;
     }
