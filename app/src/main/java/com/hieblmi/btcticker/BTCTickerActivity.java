@@ -106,7 +106,8 @@ public class BTCTickerActivity extends AppCompatActivity {
                     if (!buyQueue.isEmpty()) {
                         String side = buyQueue.peek().getSide();
                         animate(getListView(buyQueue), side);
-                    } else if (!sellQueue.isEmpty()) {
+                    }
+                    if (!sellQueue.isEmpty()) {
                         String side = sellQueue.peek().getSide();
                         animate(getListView(sellQueue), side);
                     }
@@ -142,14 +143,15 @@ public class BTCTickerActivity extends AppCompatActivity {
         ArrayAdapter<TickerUpdate> adapter = new TickerArrayAdapter<>(
                 this,
                 R.layout.ticker_view,
-                R.id.priceView,
-                updates);
+                R.id.priceView);
+        adapter.addAll(updates);
         list.setAdapter(adapter);
 
         layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+
         mBinding.mainView.addView(list, layoutParams);
         return list;
     }
@@ -177,8 +179,8 @@ public class BTCTickerActivity extends AppCompatActivity {
 
     private class TickerArrayAdapter<T extends TickerUpdate> extends ArrayAdapter<T> {
 
-        public TickerArrayAdapter(@NonNull Context context, int resource, int textViewResourceId, @NonNull List<T> objects) {
-            super(context, resource, textViewResourceId, objects);
+        public TickerArrayAdapter(@NonNull Context context, int resource, int textViewResourceId) {
+            super(context, resource, textViewResourceId);
         }
 
         @Override
