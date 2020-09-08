@@ -44,7 +44,7 @@ public class BTCTickerActivity extends AppCompatActivity {
     private final String BITCOIN = " \u20BF ";
     private final String DOLLAR = "$";
     private final String mUrl = "wss://ws-feed.pro.coinbase.com";
-    private final int ANIMATION_DURATION = 5000;
+    private final int ANIMATION_DURATION = 6000;
     private final int BACKGROUND_COLOR = 0xFF070F17;
 
     RelativeLayout.LayoutParams layoutParams;
@@ -56,7 +56,8 @@ public class BTCTickerActivity extends AppCompatActivity {
     private PriorityBlockingQueue<TickerUpdate> buyQueue;
     private PriorityBlockingQueue<TickerUpdate> sellQueue;
     Timer timer;
-    TimerTask updateUITask;
+    TimerTask updateUITaskBuys;
+    TimerTask updateUITaskSells;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +91,8 @@ public class BTCTickerActivity extends AppCompatActivity {
     }
 
     private void stopTicker() {
-        updateUITask.cancel();
+        updateUITaskBuys.cancel();
+        updateUITaskSells.cancel();
         mHttpClient.dispatcher().cancelAll();
         mBinding.mainView.removeAllViews();
     }
@@ -98,23 +100,34 @@ public class BTCTickerActivity extends AppCompatActivity {
     private void startUpdateUITimer() {
         Log.d(TAG, "Starting timer task to display ticker updates...");
         timer = new Timer();
-        updateUITask = new TimerTask() {
+        updateUITaskBuys = new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(() -> {
-                    Log.d(TAG, "Updating UI");
-                    if (!buyQueue.isEmpty()) {
-                        String side = buyQueue.peek().getSide();
-                        animate(getListView(buyQueue), side);
+                    Log.d(TAG, "Updating Buys on UI");
+                    if (buyQueue.isEmpty()) {
+                        Log.d(TAG, "No buys to update");
+                        return;
                     }
-                    if (!sellQueue.isEmpty()) {
-                        String side = sellQueue.peek().getSide();
-                        animate(getListView(sellQueue), side);
-                    }
+                    animate(getListView(buyQueue), "buy");
                 });
             }
         };
-        timer.scheduleAtFixedRate(updateUITask, 0, 500);
+        updateUITaskSells = new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(() -> {
+                    Log.d(TAG, "Updating Sells on UI");
+                    if (sellQueue.isEmpty()) {
+                        Log.d(TAG, "No sells to update");
+                        return;
+                    }
+                    animate(getListView(sellQueue), "sell");
+                });
+            }
+        };
+        timer.scheduleAtFixedRate(updateUITaskBuys, 0, 400);
+        timer.scheduleAtFixedRate(updateUITaskSells, 0, 400);
     }
 
     private void animate(ListView listView, String side) {
@@ -123,7 +136,7 @@ public class BTCTickerActivity extends AppCompatActivity {
         translationAnimation.setInterpolator(new DecelerateInterpolator(1.5f));
         translationAnimation.setDuration(ANIMATION_DURATION);
         AnimatorSet animation = new AnimatorSet();
-        animation.play(backgroundFade).with(translationAnimation);
+        animation.play(translationAnimation).with(backgroundFade);
         final ListView v = listView;
         animation.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -163,7 +176,7 @@ public class BTCTickerActivity extends AppCompatActivity {
                 new ArgbEvaluator(),
                 "buy".equals(side) ? 0x6600FF00 : 0x66FF0000,
                 BACKGROUND_COLOR);
-        colorFade.setDuration(170);
+        colorFade.setDuration(100);
         colorFade.setStartDelay(0);
         return colorFade;
     }
