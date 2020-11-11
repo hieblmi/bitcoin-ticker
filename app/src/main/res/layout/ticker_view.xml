@@ -10,9 +10,9 @@
         android:id="@+id/priceView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="monospace"
+        android:fontFamily="@font/stocky"
         android:text="@{price}"
-        android:textSize="24sp">
+        android:textSize="28sp">
 
     </TextView>
 </LinearLayout>
