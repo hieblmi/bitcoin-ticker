@@ -21,7 +21,6 @@ import okio.ByteString;
 
 public class BTCWebSocketListener extends WebSocketListener {
 
-    private final String TAG = this.getClass().getName();
     private Activity mActivity;
     private ActivityBtctickerBinding mBinding;
     private Queue mBuyQueue;
@@ -55,7 +54,6 @@ public class BTCWebSocketListener extends WebSocketListener {
         super.onMessage(webSocket, response);
 
         TickerUpdate update = new Gson().fromJson(response, TickerUpdate.class);
-        Log.d(TAG, update.toString());
 
         if (!"ticker".equals(update.getType()))
             return;
@@ -88,7 +86,6 @@ public class BTCWebSocketListener extends WebSocketListener {
             in_s.read(b);
             webSocket.send(new String(b));
         } catch (Exception e) {
-            Log.d(TAG, "onOpen");
             e.printStackTrace();
         }
     }

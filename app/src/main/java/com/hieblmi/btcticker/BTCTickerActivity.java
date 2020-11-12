@@ -40,7 +40,6 @@ import okhttp3.WebSocketListener;
 
 public class BTCTickerActivity extends AppCompatActivity {
 
-    private final String TAG = this.getClass().getName();
     private final String BITCOIN = " \u20BF ";
     private final String DOLLAR = "$";
     private final String mUrl = "wss://ws-feed.pro.coinbase.com";
@@ -62,7 +61,6 @@ public class BTCTickerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
 
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -98,15 +96,12 @@ public class BTCTickerActivity extends AppCompatActivity {
     }
 
     private void startUpdateUITimer() {
-        Log.d(TAG, "Starting timer task to display ticker updates...");
         timer = new Timer();
         updateUITaskBuys = new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(() -> {
-                    Log.d(TAG, "Updating Buys on UI");
                     if (buyQueue.isEmpty()) {
-                        Log.d(TAG, "No buys to update");
                         return;
                     }
                     animate(getListView(buyQueue), "buy");
@@ -117,9 +112,7 @@ public class BTCTickerActivity extends AppCompatActivity {
             @Override
             public void run() {
                 runOnUiThread(() -> {
-                    Log.d(TAG, "Updating Sells on UI");
                     if (sellQueue.isEmpty()) {
-                        Log.d(TAG, "No sells to update");
                         return;
                     }
                     animate(getListView(sellQueue), "sell");
@@ -215,7 +208,6 @@ public class BTCTickerActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "onPause");
         super.onPause();
 
         stopTicker();
@@ -223,7 +215,6 @@ public class BTCTickerActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "onResume");
         super.onResume();
 
         startTicker();
@@ -231,7 +222,6 @@ public class BTCTickerActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy");
         super.onDestroy();
 
         stopTicker();
