@@ -10,7 +10,7 @@
         android:id="@+id/priceView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/stocky"
+        android:fontFamily="@font/ubuntu_mono_bold"
         android:text="@{price}"
         android:textSize="28sp">
 

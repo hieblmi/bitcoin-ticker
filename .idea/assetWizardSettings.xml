@@ -81,7 +81,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="$USER_HOME$/Downloads/ic_launcher (2)/web_hi_res_512.png" />
+                                                <entry key="imagePath" value="$USER_HOME$/Downloads/ic_launcher (3)/web_hi_res_512.png" />
                                                 <entry key="scalingPercent" value="115" />
                                                 <entry key="trimmed" value="true" />
                                               </map>
@@ -120,7 +120,6 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="ffb600" />
                                     </map>
                                   </option>
                                 </PersistentState>
