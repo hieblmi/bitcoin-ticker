@@ -43,7 +43,7 @@ public class BTCTickerActivity extends AppCompatActivity {
     private final String BITCOIN = " \u20BF ";
     private final String DOLLAR = "$";
     private final String mUrl = "wss://ws-feed.pro.coinbase.com";
-    private final int ANIMATION_DURATION = 5000;
+    private final int ANIMATION_DURATION = 6000;
     private final int BACKGROUND_COLOR = 0xFF070F17;
 
     RelativeLayout.LayoutParams layoutParams;
@@ -134,7 +134,7 @@ public class BTCTickerActivity extends AppCompatActivity {
         animation.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mBinding.mainView.removeView(listView);
+                mBinding.mainView.removeView(v);
             }
         });
         animation.start();
