@@ -1,7 +1,7 @@
-# bitcoin-ticker
-A simple Bitcoin price ticker app for Android.
+# A simple Bitcoin price ticker app for Android
 
-Bitcoin Ticker listens to Coinbase’s via websocket for order matches on the BTC-USD trading pair and uses Android’s Animator framework to display the updates. I tried to sketch it’s workings below:
+bitcoin-ticker subscribes to BTC-USD order-match events via Coinbase's websocket and uses Android’s Animator framework to display the updates.
+A little sketch of it's workings:
 ![Sketch](/blob/BTCTickScreenshot.jpg)
 
 Demo video on YouTube: https://www.youtube.com/watch?v=y6o3KbBVk8Y
